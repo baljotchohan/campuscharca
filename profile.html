@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Campus Charcha</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <a href="index.html"><img src="logo.png" alt="Campus Charcha Logo"></a>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="features.html">Features</a></li>
+            <li><a href="chatbot.html">Chatbot</a></li>
+            <li><a href="quiz.html">Quiz</a></li>
+            <li><a href="progress.html">Progress</a></li>
+            <li><a href="profile.html">Profile</a></li>
+        </ul>
+    </nav>
+    <canvas id="interactive-bubbles"></canvas>
+
+    <div class="container profile-page">
+        <div class="profile-container">
+            
+
+            <h1>Profile</h1>
+
+            <div class="profile-icon-container">
+                <img id="profile-pic" src="pic/profile.jpg" alt="Profile Picture">
+                <input type="file" id="profile-pic-upload" accept="image/*">
+            </div>
+
+            <div class="profile-fields">
+                <div class="profile-field-group">
+                    <label for="name">Full Name:</label>
+                    <input type="text" id="name" placeholder="Enter your full name" required>
+                </div>
+                <div class="profile-field-group">
+                    <label for="email">Email Address:</label>
+                    <input type="email" id="email" placeholder="your.email@example.com" required>
+                </div>
+                <div class="profile-field-group">
+                    <label for="phone">Phone Number:</label>
+                    <input type="tel" id="phone" placeholder="+1 (555) 123-4567">
+                </div>
+                <div class="profile-field-group">
+                    <label for="university">University/College:</label>
+                    <input type="text" id="university" placeholder="Your university name">
+                </div>
+                <div class="profile-field-group">
+                    <label for="major">Major/Field of Study:</label>
+                    <input type="text" id="major" placeholder="e.g., Computer Science">
+                </div>
+                <div class="profile-field-group">
+                    <label for="graduation">Expected Graduation:</label>
+                    <input type="month" id="graduation" placeholder="Graduation date">
+                </div>
+                <div class="profile-field-group">
+                    <label for="skills">Technical Skills:</label>
+                    <input type="text" id="skills" placeholder="e.g., JavaScript, Python, React, Machine Learning">
+                </div>
+                <div class="profile-field-group">
+                    <label for="interests">Career Interests:</label>
+                    <input type="text" id="interests" placeholder="e.g., Software Development, Data Science">
+                </div>
+                <div class="profile-field-group">
+                    <label for="bio">Bio:</label>
+                    <textarea id="bio" placeholder="Tell us about yourself, your goals, and what you're passionate about..." rows="4"></textarea>
+                </div>
+                
+                <button class="profile-save-btn" id="save-profile-btn">
+                    <i class="fas fa-save"></i> Save Profile
+                </button>
+            </div>
+
+            <!-- Success Message -->
+            <div class="success-message" id="success-message">
+                Profile saved successfully! 🎉
+            </div>
+
+            <!-- Profile Statistics -->
+            <div class="profile-stats" id="profile-stats">
+                <div class="stat-card">
+                    <h3>Profile Completion</h3>
+                    <div class="completion-bar">
+                        <div class="completion-fill" id="completion-fill"></div>
+                    </div>
+                    <p id="completion-percentage">0%</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Last Updated</h3>
+                    <p id="last-updated">Never</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Skills Count</h3>
+                    <p id="skills-count">0</p>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="profile-actions">
+                <button class="btn btn-secondary" id="export-profile-btn">
+                    <i class="fas fa-download"></i> Export Profile
+                </button>
+                <button class="btn btn-secondary" id="clear-profile-btn">
+                    <i class="fas fa-trash"></i> Clear Profile
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const profilePic = document.getElementById('profile-pic');
+    const profilePicUpload = document.getElementById('profile-pic-upload');
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const phoneInput = document.getElementById('phone');
+    const universityInput = document.getElementById('university');
+    const majorInput = document.getElementById('major');
+    const graduationInput = document.getElementById('graduation');
+    const skillsInput = document.getElementById('skills');
+    const interestsInput = document.getElementById('interests');
+    const bioInput = document.getElementById('bio');
+    const saveProfileBtn = document.getElementById('save-profile-btn');
+    const successMessage = document.getElementById('success-message');
+    const completionPercentage = document.getElementById('completion-percentage');
+    const completionFill = document.getElementById('completion-fill');
+    const lastUpdated = document.getElementById('last-updated');
+    const skillsCount = document.getElementById('skills-count');
+    const exportProfileBtn = document.getElementById('export-profile-btn');
+    const clearProfileBtn = document.getElementById('clear-profile-btn');
+
+    // Load profile data from localStorage
+    function loadProfile() {
+        const savedProfile = JSON.parse(localStorage.getItem('userProfile'));
+        if (savedProfile) {
+            nameInput.value = savedProfile.name || '';
+            emailInput.value = savedProfile.email || '';
+            phoneInput.value = savedProfile.phone || '';
+            universityInput.value = savedProfile.university || '';
+            majorInput.value = savedProfile.major || '';
+            graduationInput.value = savedProfile.graduation || '';
+            skillsInput.value = savedProfile.skills || '';
+            interestsInput.value = savedProfile.interests || '';
+            bioInput.value = savedProfile.bio || '';
+            if (savedProfile.profilePic) {
+                profilePic.src = savedProfile.profilePic;
+            }
+        }
+        updateProfileStats();
+    }
+
+    // Save profile data to localStorage
+    function saveProfile() {
+        // Basic validation
+        if (!nameInput.value.trim() || !emailInput.value.trim()) {
+            alert('Please fill in at least your name and email address.');
+            return;
+        }
+
+        const userProfile = {
+            name: nameInput.value.trim(),
+            email: emailInput.value.trim(),
+            phone: phoneInput.value.trim(),
+            university: universityInput.value.trim(),
+            major: majorInput.value.trim(),
+            graduation: graduationInput.value,
+            skills: skillsInput.value.trim(),
+            interests: interestsInput.value.trim(),
+            bio: bioInput.value.trim(),
+            profilePic: profilePic.src,
+            lastUpdated: new Date().toISOString()
+        };
+        
+        localStorage.setItem('userProfile', JSON.stringify(userProfile));
+        
+        // Show success message
+        successMessage.classList.add('show');
+        setTimeout(() => {
+            successMessage.classList.remove('show');
+        }, 3000);
+        
+        // Update profile statistics
+        updateProfileStats();
+    }
+
+    // Handle profile picture upload
+    profilePicUpload.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                alert('Please select an image file.');
+                return;
+            }
+            
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Image size should be less than 5MB.');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                profilePic.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Update profile statistics
+    function updateProfileStats() {
+        const savedProfile = JSON.parse(localStorage.getItem('userProfile'));
+        
+        if (savedProfile) {
+            // Calculate completion percentage
+            const fields = ['name', 'email', 'phone', 'university', 'major', 'graduation', 'skills', 'interests', 'bio'];
+            const filledFields = fields.filter(field => savedProfile[field] && savedProfile[field].trim() !== '');
+            const completion = Math.round((filledFields.length / fields.length) * 100);
+            completionPercentage.textContent = `${completion}%`;
+            completionFill.style.width = `${completion}%`;
+            
+            // Update last updated
+            if (savedProfile.lastUpdated) {
+                const date = new Date(savedProfile.lastUpdated);
+                lastUpdated.textContent = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+            }
+            
+            // Update skills count
+            if (savedProfile.skills) {
+                const skillsArray = savedProfile.skills.split(',').filter(skill => skill.trim() !== '');
+                skillsCount.textContent = skillsArray.length;
+            } else {
+                skillsCount.textContent = '0';
+            }
+        } else {
+            completionPercentage.textContent = '0%';
+            lastUpdated.textContent = 'Never';
+            skillsCount.textContent = '0';
+        }
+    }
+
+    // Export profile data
+    function exportProfile() {
+        const savedProfile = JSON.parse(localStorage.getItem('userProfile'));
+        if (!savedProfile || Object.keys(savedProfile).length === 0) {
+            alert('No profile data to export.');
+            return;
+        }
+
+        const profileData = {
+            ...savedProfile,
+            exportedAt: new Date().toISOString()
+        };
+
+        const dataStr = JSON.stringify(profileData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `profile_${savedProfile.name || 'user'}_${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+
+    // Clear profile data
+    function clearProfile() {
+        if (confirm('Are you sure you want to clear all profile data? This action cannot be undone.')) {
+            localStorage.removeItem('userProfile');
+            
+            // Clear all input fields
+            nameInput.value = '';
+            emailInput.value = '';
+            phoneInput.value = '';
+            universityInput.value = '';
+            majorInput.value = '';
+            graduationInput.value = '';
+            skillsInput.value = '';
+            interestsInput.value = '';
+            bioInput.value = '';
+            
+            // Reset profile picture
+            profilePic.src = 'pic/profile.jpg';
+            
+            // Reset completion bar
+            completionFill.style.width = '0%';
+            
+            // Update statistics
+            updateProfileStats();
+            
+            // Show success message
+            successMessage.textContent = 'Profile cleared successfully!';
+            successMessage.style.background = 'rgba(244, 67, 54, 0.9)';
+            successMessage.classList.add('show');
+            setTimeout(() => {
+                successMessage.classList.remove('show');
+                successMessage.textContent = 'Profile saved successfully! 🎉';
+                successMessage.style.background = 'rgba(76, 175, 80, 0.9)';
+            }, 3000);
+        }
+    }
+
+    // Event listener for save button
+    saveProfileBtn.addEventListener('click', saveProfile);
+
+    // Event listener for export button
+    exportProfileBtn.addEventListener('click', exportProfile);
+
+    // Event listener for clear button
+    clearProfileBtn.addEventListener('click', clearProfile);
+
+    // Load profile data when the page loads
+    window.addEventListener('load', loadProfile);
+
+    // Add real-time validation and feedback
+    const inputs = [nameInput, emailInput, phoneInput, universityInput, majorInput, graduationInput, skillsInput, interestsInput, bioInput];
+    
+    inputs.forEach(input => {
+        input.addEventListener('input', function() {
+            // Add visual feedback for filled fields
+            if (this.value.trim() !== '') {
+                this.style.borderColor = '#4CAF50';
+                this.style.boxShadow = '0 4px 15px rgba(76, 175, 80, 0.2)';
+            } else {
+                this.style.borderColor = 'transparent';
+                this.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+            }
+            
+            // Update completion in real-time
+            updateProfileStats();
+        });
+        
+        input.addEventListener('blur', function() {
+            // Reset border on blur if empty
+            if (this.value.trim() === '') {
+                this.style.borderColor = 'transparent';
+                this.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+            }
+        });
+    });
+
+    // Existing bubble animation script (ensure it's still there or re-add if needed)
+    const canvas = document.getElementById('interactive-bubbles');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let bubbles = [];
+    const mouse = {
+        x: null,
+        y: null,
+        radius: 150
+    }
+
+    window.addEventListener('mousemove', (event) => {
+        mouse.x = event.x;
+        mouse.y = event.y;
+    });
+
+    class Bubble {
+        constructor(x, y, directionX, directionY, size, color) {
+            this.x = x;
+            this.y = y;
+            this.directionX = directionX;
+            this.directionY = directionY;
+            this.size = size;
+            this.color = color;
+        }
+
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+            ctx.fillStyle = this.color;
+            ctx.fill();
+        }
+
+        update() {
+            if (this.x > canvas.width || this.x < 0) {
+                this.directionX = -this.directionX;
+            }
+            if (this.y > canvas.height || this.y < 0) {
+                this.directionY = -this.directionY;
+            }
+
+            let dx = mouse.x - this.x;
+            let dy = mouse.y - this.y;
+            let distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance < mouse.radius + this.size) {
+                if (mouse.x < this.x && this.x < canvas.width - this.size * 10) {
+                    this.x += 10;
+                }
+                if (mouse.x > this.x && this.x > this.size * 10) {
+                    this.x -= 10;
+                }
+                if (mouse.y < this.y && this.y < canvas.height - this.size * 10) {
+                    this.y += 10;
+                }
+                if (mouse.y > this.y && this.y > this.size * 10) {
+                    this.y -= 10;
+                }
+            }
+
+            this.x += this.directionX;
+            this.y += this.directionY;
+            this.draw();
+        }
+    }
+
+    function init() {
+        bubbles = [];
+        let numberOfBubbles = (canvas.height * canvas.width) / 9000;
+        for (let i = 0; i < numberOfBubbles; i++) {
+            let size = (Math.random() * 5) + 1;
+            let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
+            let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
+            let directionX = (Math.random() * 5) - 2.5;
+            let directionY = (Math.random() * 5) - 2.5;
+            let color = 'rgba(160, 82, 45, 0.3)';
+
+            bubbles.push(new Bubble(x, y, directionX, directionY, size, color));
+        }
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        ctx.clearRect(0, 0, innerWidth, innerHeight);
+
+        for (let i = 0; i < bubbles.length; i++) {
+            bubbles[i].update();
+        }
+    }
+
+    init();
+    animate();
+
+    window.addEventListener('resize', () => {
+        canvas.width = innerWidth;
+        canvas.height = innerHeight;
+        mouse.radius = 150;
+        init();
+    });
+</script>
+
+</body>
+</html>

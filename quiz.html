@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Quiz - Campus Charcha</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        .quiz-container { perspective: 1000px; position: relative; width: 100%; max-width: 500px; height: 400px; margin: auto; }
+        .quiz-card { 
+            width: 100%; height: 100%; position: absolute; transform-style: preserve-3d; transition: transform 0.5s, opacity 0.5s; 
+            background-color: rgba(255, 243, 224, 0.9); 
+            border-radius: 20px; padding: 40px; box-sizing: border-box; color: black; text-align: center; 
+        }
+        .quiz-card.active { transform: translateX(0) scale(1); opacity: 1; z-index: 10; }
+        .quiz-card.next { transform: translateX(100%) scale(0.8); opacity: 0; pointer-events: none; }
+        .quiz-card.prev { transform: translateX(-100%) scale(0.8); opacity: 0; pointer-events: none; }
+        .question p { font-size: 1.5em; font-weight: bold; }
+        .options label { display: block; margin: 10px auto; padding: 10px; background: rgba(0,0,0,0.1); border-radius: 10px; cursor: pointer; transition: background-color 0.3s; }
+        .options label:hover { background: rgba(0,0,0,0.2); }
+        .options label.selected { background: #FF6F00; color: white; }
+        #quiz-result { margin-top: 20px; font-size: 1.2em; font-weight: bold; color: white; text-align: center; }
+        #quiz-result a { color: #FFD700; }
+        .quiz-nav { margin-top: 20px; text-align: center; }
+        .celebration { text-align: center; padding: 40px; background: linear-gradient(to bottom, #FFD700, #FF6F00); border-radius: 20px; color: white; }
+        .confetti { position: fixed; width: 10px; height: 10px; background-color: #f00; top: -10px; animation: fall 5s linear infinite; }
+        @keyframes fall { 0% { transform: translateY(0) rotate(0); } 100% { transform: translateY(100vh) rotate(720deg); } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <a href="index.html"><img src="logo.png" alt="Campus Charcha Logo"></a>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="features.html">Features</a></li>
+            <li><a href="chatbot.html">Chatbot</a></li>
+            <li><a href="quiz.html">Quiz</a></li>
+            <li><a href="progress.html">Progress</a></li>
+            <li><a href="profile.html">Profile</a></li>
+        </ul>
+    </nav>
+    <canvas id="interactive-bubbles"></canvas>
+    
+
+    <div class="container quiz-page">
+        <div>
+            <h1>Career Finder Quiz</h1>
+            <div class="quiz-container" id="quiz-container">
+                <!-- Questions will be injected here by JS -->
+            </div>
+            <div class="quiz-nav">
+                <button id="prev-btn" class="btn">Prev</button>
+                <button id="next-btn" class="btn">Next</button>
+            </div>
+            <div id="quiz-result"></div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "What kind of tasks do you enjoy the most?", options: { tech: "Solving complex logical puzzles.", creative: "Creating visually appealing designs.", business: "Organizing projects and persuading people." } },
+            { q: "How do you prefer to work?", options: { tech: "Independently, with deep focus.", creative: "Collaboratively, bouncing ideas off others.", business: "In a leadership role, guiding a team." } },
+            { q: "What are you passionate about?", options: { tech: "The latest technology and innovations.", creative: "Art, culture, and aesthetics.", business: "Understanding how businesses grow and succeed." } },
+            { q: "What kind of impact do you want to make?", options: { tech: "Build tools that solve real-world problems.", creative: "Create experiences that inspire and delight people.", business: "Drive growth and create opportunities for others." } },
+            { q: "Which of these sounds most appealing?", options: { tech: "Writing code for a cutting-edge application.", creative: "Designing the user interface for that application.", business: "Managing the team that builds and markets the application." } },
+            { q: "Are you more of an introvert or an extrovert?", options: { tech: "Introvert - I prefer quiet, focused environments.", creative: "Ambivert - A mix of both.", business: "Extrovert - I thrive on social interaction." } },
+            { q: "How do you approach problems?", options: { tech: "Analytically, breaking them down into smaller pieces.", creative: "Intuitively, trusting my gut feelings and past experiences.", business: "Strategically, thinking about the long-term implications." } },
+            { q: "What are your long-term career goals?", options: { tech: "To become a technical expert in a specific field.", creative: "To build a portfolio of innovative and beautiful work.", business: "To lead a successful company or team." } }
+        ];
+        const userAnswers = {};
+        let currentQuestion = 0;
+
+        const quizContainer = document.getElementById('quiz-container');
+        const resultContainer = document.getElementById('quiz-result');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+
+        function renderQuiz() {
+            quizContainer.innerHTML = '';
+            questions.forEach((q, index) => {
+                const card = document.createElement('div');
+                card.classList.add('quiz-card');
+                if (index === currentQuestion) card.classList.add('active');
+                else if (index > currentQuestion) card.classList.add('next');
+                else card.classList.add('prev');
+
+                let optionsHTML = '';
+                for (const key in q.options) {
+                    const isSelected = userAnswers[index] === key ? 'selected' : '';
+                    optionsHTML += `<label class="${isSelected}"><input type="radio" name="q${index}" value="${key}" hidden> ${q.options[key]}</label>`;
+                }
+
+                card.innerHTML = `<div class="question"><p>(${index + 1}/${questions.length}) ${q.q}</p></div><div class="options">${optionsHTML}</div>`;
+                quizContainer.appendChild(card);
+            });
+            addCardListeners();
+        }
+
+        function addCardListeners() {
+            document.querySelectorAll('.quiz-card .options label').forEach(label => {
+                label.addEventListener('click', (e) => {
+                    const questionIndex = currentQuestion;
+                    const answer = e.target.querySelector('input').value;
+                    userAnswers[questionIndex] = answer;
+                    
+                    document.querySelectorAll(`.quiz-card:nth-child(${questionIndex + 1}) .options label`).forEach(l => l.classList.remove('selected'));
+                    e.target.classList.add('selected');
+
+                    setTimeout(() => nextQuestion(), 300);
+                });
+            });
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                renderQuiz();
+            } else {
+                showResult();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                renderQuiz();
+            }
+        }
+
+        nextBtn.addEventListener('click', nextQuestion);
+        prevBtn.addEventListener('click', prevQuestion);
+
+        function showResult() {
+            if (Object.keys(userAnswers).length !== questions.length) {
+                alert("Please answer all questions before submitting!");
+                return;
+            }
+
+            quizContainer.innerHTML = '';
+            document.querySelector('.quiz-nav').style.display = 'none';
+
+            let tech_score = 0, creative_score = 0, business_score = 0;
+            for (const key in userAnswers) {
+                if (userAnswers[key] === 'tech') tech_score++;
+                if (userAnswers[key] === 'creative') creative_score++;
+                if (userAnswers[key] === 'business') business_score++;
+            }
+
+            let resultHTML = '';
+            if (tech_score >= 3) {
+                 resultHTML = `<h3>Congratulations! Here is your recommendation:</h3><h4>Tech Field</h4><p>Your answers suggest a strong aptitude for technology and problem-solving.</p><ul><li><strong>Software Engineer</strong></li><li><strong>Data Scientist</strong></li><li><strong>Cybersecurity Analyst</strong></li></ul>`;
+            } else if (creative_score >= 3) {
+                resultHTML = `<h3>Congratulations! Here is your recommendation:</h3><h4>Creative Field</h4><p>You have a passion for design and visual communication.</p><ul><li><strong>UI/UX Designer</strong></li><li><strong>Graphic Designer</strong></li><li><strong>Marketing Specialist</strong></li></ul>`;
+            } else if (business_score >= 3) {
+                resultHTML = `<h3>Congratulations! Here is your recommendation:</h3><h4>Business Field</h4><p>Your answers indicate strong leadership and strategic thinking skills.</p><ul><li><strong>Product Manager</strong></li><li><strong>Business Analyst</strong></li><li><strong>Management Consultant</strong></li></ul>`;
+            } else {
+                 resultHTML = `<h3>Congratulations! Here is your recommendation:</h3><h4>Interdisciplinary Fields</h4><p>You have a diverse range of interests! This is a huge strength.</p>`;
+            }
+            
+            resultContainer.innerHTML = `<div class="celebration">${resultHTML}</div>`;
+            launchConfetti();
+        }
+
+        function launchConfetti() {
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.animationDelay = Math.random() * 5 + 's';
+                confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                document.body.appendChild(confetti);
+            }
+        }
+
+        const canvas = document.getElementById('interactive-bubbles');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let bubbles = [];
+        const mouse = {
+            x: null,
+            y: null,
+            radius: 150
+        }
+
+        window.addEventListener('mousemove', (event) => {
+            mouse.x = event.x;
+            mouse.y = event.y;
+        });
+
+        class Bubble {
+            constructor(x, y, directionX, directionY, size, color) {
+                this.x = x;
+                this.y = y;
+                this.directionX = directionX;
+                this.directionY = directionY;
+                this.size = size;
+                this.color = color;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+
+            update() {
+                if (this.x > canvas.width || this.x < 0) {
+                    this.directionX = -this.directionX;
+                }
+                if (this.y > canvas.height || this.y < 0) {
+                    this.directionY = -this.directionY;
+                }
+
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < mouse.radius + this.size) {
+                    if (mouse.x < this.x && this.x < canvas.width - this.size * 10) {
+                        this.x += 10;
+                    }
+                    if (mouse.x > this.x && this.x > this.size * 10) {
+                        this.x -= 10;
+                    }
+                    if (mouse.y < this.y && this.y < canvas.height - this.size * 10) {
+                        this.y += 10;
+                    }
+                    if (mouse.y > this.y && this.y > this.size * 10) {
+                        this.y -= 10;
+                    }
+                }
+
+                this.x += this.directionX;
+                this.y += this.directionY;
+                this.draw();
+            }
+        }
+
+        function init() {
+            bubbles = [];
+            let numberOfBubbles = (canvas.height * canvas.width) / 9000;
+            for (let i = 0; i < numberOfBubbles; i++) {
+                let size = (Math.random() * 5) + 1;
+                let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
+                let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
+                let directionX = (Math.random() * 5) - 2.5;
+                let directionY = (Math.random() * 5) - 2.5;
+                let color = 'rgba(160, 82, 45, 0.3)';
+
+                bubbles.push(new Bubble(x, y, directionX, directionY, size, color));
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.clearRect(0, 0, innerWidth, innerHeight);
+
+            for (let i = 0; i < bubbles.length; i++) {
+                bubbles[i].update();
+            }
+        }
+
+        init();
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = innerWidth;
+            canvas.height = innerHeight;
+            mouse.radius = 150;
+            init();
+        });
+
+        renderQuiz();
+    </script>
+
+</body>
+</html>

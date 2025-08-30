@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Task Tracker - Campus Charcha</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <a href="index.html"><img src="logo.png" alt="Campus Charcha Logo"></a>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="features.html">Features</a></li>
+            <li><a href="chatbot.html">Chatbot</a></li>
+            <li><a href="quiz.html">Quiz</a></li>
+            <li><a href="progress.html">Progress</a></li>
+            <li><a href="profile.html">Profile</a></li>
+        </ul>
+    </nav>
+    <canvas id="interactive-bubbles"></canvas>
+
+    <div class="container progress-page">
+        <div class="task-tracker-container">
+            <h1>Daily Task Tracker</h1>
+            <p class="subtitle">Track your daily progress and achieve your goals</p>
+            
+            <!-- Quick Stats -->
+            <div class="quick-stats">
+                <div class="stat-item">
+                    <i class="fas fa-tasks"></i>
+                    <div>
+                        <h3 id="total-tasks">0</h3>
+                        <p>Total Tasks</p>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <h3 id="completed-tasks">0</h3>
+                        <p>Completed</p>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-clock"></i>
+                    <div>
+                        <h3 id="pending-tasks">0</h3>
+                        <p>Pending</p>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-fire"></i>
+                    <div>
+                        <h3 id="streak-days">0</h3>
+                        <p>Day Streak</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add New Task -->
+            <div class="add-task-section">
+                <h2>Add New Task</h2>
+                <form id="add-task-form" class="task-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="task-title">Task Title</label>
+                            <input type="text" id="task-title" placeholder="What do you need to do?" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="task-category">Category</label>
+                            <select id="task-category" required>
+                                <option value="">Select Category</option>
+                                <option value="study">Study</option>
+                                <option value="work">Work</option>
+                                <option value="personal">Personal</option>
+                                <option value="health">Health</option>
+                                <option value="social">Social</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="task-description">Description</label>
+                            <textarea id="task-description" placeholder="Add details about your task..." rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="task-priority">Priority</label>
+                            <select id="task-priority" required>
+                                <option value="">Select Priority</option>
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                                <option value="urgent">Urgent</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="task-deadline">Deadline</label>
+                            <input type="datetime-local" id="task-deadline">
+                        </div>
+                        <div class="form-group">
+                            <label for="task-estimated-time">Estimated Time (hours)</label>
+                            <input type="number" id="task-estimated-time" min="0.5" step="0.5" placeholder="2.5">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Task
+                    </button>
+                </form>
+            </div>
+
+            <!-- Task Filters and Search -->
+            <div class="task-controls">
+                <div class="search-section">
+                    <input type="text" id="task-search" placeholder="Search tasks..." class="search-input">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+                <div class="filter-section">
+                    <select id="category-filter" class="filter-select">
+                        <option value="">All Categories</option>
+                        <option value="study">Study</option>
+                        <option value="work">Work</option>
+                        <option value="personal">Personal</option>
+                        <option value="health">Health</option>
+                        <option value="social">Social</option>
+                    </select>
+                    <select id="status-filter" class="filter-select">
+                        <option value="">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                    <select id="priority-filter" class="filter-select">
+                        <option value="">All Priorities</option>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="urgent">Urgent</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Task List -->
+            <div class="task-list-section">
+                <h2>Your Tasks</h2>
+                <div id="task-list" class="task-list">
+                    <!-- Tasks will be dynamically added here -->
+                </div>
+            </div>
+
+            <!-- Progress Charts -->
+            <div class="progress-charts">
+                <h2>Progress Overview</h2>
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h3>Weekly Progress</h3>
+                        <div class="weekly-chart" id="weekly-chart">
+                            <!-- Weekly progress bars will be added here -->
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Category Distribution</h3>
+                        <div class="category-chart" id="category-chart">
+                            <!-- Category distribution will be added here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Goals Section -->
+            <div class="goals-section">
+                <h2>Set Your Goals</h2>
+                <div class="goals-container">
+                    <div class="goal-card">
+                        <h3>Daily Goal</h3>
+                        <p>Complete <span id="daily-goal-count">3</span> tasks today</p>
+                        <div class="goal-progress">
+                            <div class="goal-bar">
+                                <div class="goal-fill" id="daily-goal-fill"></div>
+                            </div>
+                            <span id="daily-goal-progress">0/3</span>
+                        </div>
+                    </div>
+                    <div class="goal-card">
+                        <h3>Weekly Goal</h3>
+                        <p>Complete <span id="weekly-goal-count">15</span> tasks this week</p>
+                        <div class="goal-progress">
+                            <div class="goal-bar">
+                                <div class="goal-fill" id="weekly-goal-fill"></div>
+                            </div>
+                            <span id="weekly-goal-progress">0/15</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Detail Modal -->
+    <div id="task-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="task-modal-content">
+                <!-- Task details will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Task Tracker Application
+        class TaskTracker {
+            constructor() {
+                this.tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+                this.goals = JSON.parse(localStorage.getItem('goals')) || {
+                    daily: 3,
+                    weekly: 15
+                };
+                this.streak = JSON.parse(localStorage.getItem('streak')) || {
+                    current: 0,
+                    lastDate: null
+                };
+                
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.updateStreak();
+                this.renderTasks();
+                this.updateStats();
+                this.updateGoals();
+                this.renderCharts();
+            }
+
+            setupEventListeners() {
+                // Add task form
+                document.getElementById('add-task-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.addTask();
+                });
+
+                // Search and filters
+                document.getElementById('task-search').addEventListener('input', (e) => {
+                    this.filterTasks();
+                });
+
+                document.getElementById('category-filter').addEventListener('change', () => {
+                    this.filterTasks();
+                });
+
+                document.getElementById('status-filter').addEventListener('change', () => {
+                    this.filterTasks();
+                });
+
+                document.getElementById('priority-filter').addEventListener('change', () => {
+                    this.filterTasks();
+                });
+
+                // Modal close
+                document.querySelector('.close').addEventListener('click', () => {
+                    this.closeModal();
+                });
+
+                window.addEventListener('click', (e) => {
+                    if (e.target === document.getElementById('task-modal')) {
+                        this.closeModal();
+                    }
+                });
+            }
+
+            addTask() {
+                const title = document.getElementById('task-title').value.trim();
+                const category = document.getElementById('task-category').value;
+                const description = document.getElementById('task-description').value.trim();
+                const priority = document.getElementById('task-priority').value;
+                const deadline = document.getElementById('task-deadline').value;
+                const estimatedTime = parseFloat(document.getElementById('task-estimated-time').value) || 0;
+
+                if (!title || !category || !priority) {
+                    alert('Please fill in all required fields.');
+                    return;
+                }
+
+                const task = {
+                    id: Date.now(),
+                    title,
+                    category,
+                    description,
+                    priority,
+                    deadline,
+                    estimatedTime,
+                    status: 'pending',
+                    createdAt: new Date().toISOString(),
+                    completedAt: null,
+                    timeSpent: 0
+                };
+
+                this.tasks.push(task);
+                this.saveTasks();
+                this.renderTasks();
+                this.updateStats();
+                this.updateGoals();
+
+                // Reset form
+                document.getElementById('add-task-form').reset();
+                
+                // Show success message
+                this.showNotification('Task added successfully!', 'success');
+            }
+
+            updateTaskStatus(taskId, newStatus) {
+                const task = this.tasks.find(t => t.id === taskId);
+                if (task) {
+                    task.status = newStatus;
+                    if (newStatus === 'completed') {
+                        task.completedAt = new Date().toISOString();
+                        this.updateStreak();
+                    }
+                    this.saveTasks();
+                    this.renderTasks();
+                    this.updateStats();
+                    this.updateGoals();
+                }
+            }
+
+            deleteTask(taskId) {
+                if (confirm('Are you sure you want to delete this task?')) {
+                    this.tasks = this.tasks.filter(t => t.id !== taskId);
+                    this.saveTasks();
+                    this.renderTasks();
+                    this.updateStats();
+                    this.updateGoals();
+                    this.showNotification('Task deleted successfully!', 'success');
+                }
+            }
+
+            updateStreak() {
+                const today = new Date().toDateString();
+                const lastDate = this.streak.lastDate ? new Date(this.streak.lastDate).toDateString() : null;
+
+                if (lastDate !== today) {
+                    const hasCompletedTasksToday = this.tasks.some(task => 
+                        task.status === 'completed' && 
+                        new Date(task.completedAt).toDateString() === today
+                    );
+
+                    if (hasCompletedTasksToday) {
+                        if (lastDate === new Date(Date.now() - 24 * 60 * 60 * 1000).toDateString()) {
+                            this.streak.current++;
+                        } else if (lastDate !== today) {
+                            this.streak.current = 1;
+                        }
+                        this.streak.lastDate = new Date().toISOString();
+                        localStorage.setItem('streak', JSON.stringify(this.streak));
+                    }
+                }
+            }
+
+            renderTasks() {
+                const taskList = document.getElementById('task-list');
+                const filteredTasks = this.getFilteredTasks();
+
+                if (filteredTasks.length === 0) {
+                    taskList.innerHTML = '<div class="no-tasks">No tasks found. Add a new task to get started!</div>';
+                    return;
+                }
+
+                taskList.innerHTML = filteredTasks.map(task => `
+                    <div class="task-item ${task.status} priority-${task.priority}" data-task-id="${task.id}">
+                        <div class="task-header">
+                            <div class="task-title-section">
+                                <h3>${this.escapeHtml(task.title)}</h3>
+                                <span class="task-category ${task.category}">${task.category}</span>
+                                <span class="task-priority ${task.priority}">${task.priority}</span>
+                            </div>
+                            <div class="task-actions">
+                                <button class="btn-icon" onclick="taskTracker.toggleTaskStatus(${task.id})" title="Toggle Status">
+                                    <i class="fas fa-${task.status === 'completed' ? 'undo' : 'check'}"></i>
+                                </button>
+                                <button class="btn-icon" onclick="taskTracker.editTask(${task.id})" title="Edit Task">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-icon" onclick="taskTracker.deleteTask(${task.id})" title="Delete Task">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="task-details">
+                            ${task.description ? `<p class="task-description">${this.escapeHtml(task.description)}</p>` : ''}
+                            <div class="task-meta">
+                                ${task.deadline ? `<span class="task-deadline"><i class="fas fa-calendar"></i> ${this.formatDate(task.deadline)}</span>` : ''}
+                                ${task.estimatedTime ? `<span class="task-time"><i class="fas fa-clock"></i> ${task.estimatedTime}h</span>` : ''}
+                                <span class="task-created"><i class="fas fa-calendar-plus"></i> ${this.formatDate(task.createdAt)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            getFilteredTasks() {
+                let filtered = [...this.tasks];
+                const search = document.getElementById('task-search').value.toLowerCase();
+                const category = document.getElementById('category-filter').value;
+                const status = document.getElementById('status-filter').value;
+                const priority = document.getElementById('priority-filter').value;
+
+                if (search) {
+                    filtered = filtered.filter(task => 
+                        task.title.toLowerCase().includes(search) ||
+                        task.description.toLowerCase().includes(search)
+                    );
+                }
+
+                if (category) {
+                    filtered = filtered.filter(task => task.category === category);
+                }
+
+                if (status) {
+                    filtered = filtered.filter(task => task.status === status);
+                }
+
+                if (priority) {
+                    filtered = filtered.filter(task => task.priority === priority);
+                }
+
+                // Sort by priority and creation date
+                filtered.sort((a, b) => {
+                    const priorityOrder = { urgent: 4, high: 3, medium: 2, low: 1 };
+                    if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
+                        return priorityOrder[b.priority] - priorityOrder[a.priority];
+                    }
+                    return new Date(b.createdAt) - new Date(a.createdAt);
+                });
+
+                return filtered;
+            }
+
+            filterTasks() {
+                this.renderTasks();
+            }
+
+            toggleTaskStatus(taskId) {
+                const task = this.tasks.find(t => t.id === taskId);
+                if (task) {
+                    const newStatus = task.status === 'completed' ? 'pending' : 'completed';
+                    this.updateTaskStatus(taskId, newStatus);
+                    this.showNotification(`Task ${newStatus}!`, 'success');
+                }
+            }
+
+            editTask(taskId) {
+                const task = this.tasks.find(t => t.id === taskId);
+                if (task) {
+                    this.showTaskModal(task);
+                }
+            }
+
+            showTaskModal(task) {
+                const modal = document.getElementById('task-modal');
+                const content = document.getElementById('task-modal-content');
+                
+                content.innerHTML = `
+                    <h2>Edit Task</h2>
+                    <form id="edit-task-form">
+                        <div class="form-group">
+                            <label>Title</label>
+                            <input type="text" id="edit-title" value="${this.escapeHtml(task.title)}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea id="edit-description" rows="3">${this.escapeHtml(task.description)}</textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Category</label>
+                                <select id="edit-category" required>
+                                    <option value="study" ${task.category === 'study' ? 'selected' : ''}>Study</option>
+                                    <option value="work" ${task.category === 'work' ? 'selected' : ''}>Work</option>
+                                    <option value="personal" ${task.category === 'personal' ? 'selected' : ''}>Personal</option>
+                                    <option value="health" ${task.category === 'health' ? 'selected' : ''}>Health</option>
+                                    <option value="social" ${task.category === 'social' ? 'selected' : ''}>Social</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Priority</label>
+                                <select id="edit-priority" required>
+                                    <option value="low" ${task.priority === 'low' ? 'selected' : ''}>Low</option>
+                                    <option value="medium" ${task.priority === 'medium' ? 'selected' : ''}>Medium</option>
+                                    <option value="high" ${task.priority === 'high' ? 'selected' : ''}>High</option>
+                                    <option value="urgent" ${task.priority === 'urgent' ? 'selected' : ''}>Urgent</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Deadline</label>
+                                <input type="datetime-local" id="edit-deadline" value="${task.deadline || ''}">
+                            </div>
+                            <div class="form-group">
+                                <label>Estimated Time (hours)</label>
+                                <input type="number" id="edit-estimated-time" value="${task.estimatedTime || ''}" min="0.5" step="0.5">
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <button type="button" class="btn btn-secondary" onclick="taskTracker.closeModal()">Cancel</button>
+                        </div>
+                    </form>
+                `;
+
+                // Handle form submission
+                document.getElementById('edit-task-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.saveTaskChanges(task.id);
+                });
+
+                modal.style.display = 'block';
+            }
+
+            saveTaskChanges(taskId) {
+                const task = this.tasks.find(t => t.id === taskId);
+                if (task) {
+                    task.title = document.getElementById('edit-title').value.trim();
+                    task.description = document.getElementById('edit-description').value.trim();
+                    task.category = document.getElementById('edit-category').value;
+                    task.priority = document.getElementById('edit-priority').value;
+                    task.deadline = document.getElementById('edit-deadline').value;
+                    task.estimatedTime = parseFloat(document.getElementById('edit-estimated-time').value) || 0;
+
+                    this.saveTasks();
+                    this.renderTasks();
+                    this.updateStats();
+                    this.closeModal();
+                    this.showNotification('Task updated successfully!', 'success');
+                }
+            }
+
+            closeModal() {
+                document.getElementById('task-modal').style.display = 'none';
+            }
+
+            updateStats() {
+                const totalTasks = this.tasks.length;
+                const completedTasks = this.tasks.filter(t => t.status === 'completed').length;
+                const pendingTasks = totalTasks - completedTasks;
+
+                document.getElementById('total-tasks').textContent = totalTasks;
+                document.getElementById('completed-tasks').textContent = completedTasks;
+                document.getElementById('pending-tasks').textContent = pendingTasks;
+                document.getElementById('streak-days').textContent = this.streak.current;
+            }
+
+            updateGoals() {
+                const today = new Date().toDateString();
+                const thisWeek = this.getWeekDates();
+                
+                const dailyCompleted = this.tasks.filter(task => 
+                    task.status === 'completed' && 
+                    new Date(task.completedAt).toDateString() === today
+                ).length;
+                
+                const weeklyCompleted = this.tasks.filter(task => 
+                    task.status === 'completed' && 
+                    thisWeek.includes(new Date(task.completedAt).toDateString())
+                ).length;
+
+                const dailyGoal = this.goals.daily;
+                const weeklyGoal = this.goals.weekly;
+
+                document.getElementById('daily-goal-progress').textContent = `${dailyCompleted}/${dailyGoal}`;
+                document.getElementById('weekly-goal-progress').textContent = `${weeklyCompleted}/${weeklyGoal}`;
+
+                const dailyProgress = Math.min((dailyCompleted / dailyGoal) * 100, 100);
+                const weeklyProgress = Math.min((weeklyCompleted / weeklyGoal) * 100, 100);
+
+                document.getElementById('daily-goal-fill').style.width = `${dailyProgress}%`;
+                document.getElementById('weekly-goal-fill').style.width = `${weeklyProgress}%`;
+            }
+
+            getWeekDates() {
+                const dates = [];
+                const today = new Date();
+                const startOfWeek = new Date(today);
+                startOfWeek.setDate(today.getDate() - today.getDay());
+                
+                for (let i = 0; i < 7; i++) {
+                    const date = new Date(startOfWeek);
+                    date.setDate(startOfWeek.getDate() + i);
+                    dates.push(date.toDateString());
+                }
+                
+                return dates;
+            }
+
+            renderCharts() {
+                this.renderWeeklyChart();
+                this.renderCategoryChart();
+            }
+
+            renderWeeklyChart() {
+                const weeklyChart = document.getElementById('weekly-chart');
+                const weekDates = this.getWeekDates();
+                const weekData = weekDates.map(date => {
+                    const completed = this.tasks.filter(task => 
+                        task.status === 'completed' && 
+                        new Date(task.completedAt).toDateString() === date
+                    ).length;
+                    return { date, completed };
+                });
+
+                weeklyChart.innerHTML = weekData.map(({ date, completed }) => {
+                    const dayName = new Date(date).toLocaleDateString('en-US', { weekday: 'short' });
+                    const maxHeight = 100;
+                    const height = Math.max(completed * 20, 10);
+                    
+                    return `
+                        <div class="week-bar">
+                            <div class="bar" style="height: ${height}px; background: ${completed > 0 ? '#4CAF50' : '#ddd'}"></div>
+                            <span class="bar-label">${dayName}</span>
+                            <span class="bar-value">${completed}</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            renderCategoryChart() {
+                const categoryChart = document.getElementById('category-chart');
+                const categories = ['study', 'work', 'personal', 'health', 'social'];
+                const categoryData = categories.map(cat => {
+                    const total = this.tasks.filter(task => task.category === cat).length;
+                    const completed = this.tasks.filter(task => task.category === cat && task.status === 'completed').length;
+                    return { category: cat, total, completed };
+                });
+
+                categoryChart.innerHTML = categoryData.map(({ category, total, completed }) => {
+                    if (total === 0) return '';
+                    
+                    const percentage = total > 0 ? (completed / total) * 100 : 0;
+                    const color = this.getCategoryColor(category);
+                    
+                    return `
+                        <div class="category-item">
+                            <div class="category-info">
+                                <span class="category-name">${category.charAt(0).toUpperCase() + category.slice(1)}</span>
+                                <span class="category-count">${completed}/${total}</span>
+                            </div>
+                            <div class="category-bar">
+                                <div class="category-fill" style="width: ${percentage}%; background: ${color}"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            getCategoryColor(category) {
+                const colors = {
+                    study: '#4CAF50',
+                    work: '#2196F3',
+                    personal: '#FF9800',
+                    health: '#E91E63',
+                    social: '#9C27B0'
+                };
+                return colors[category] || '#666';
+            }
+
+            showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.classList.add('show');
+                }, 100);
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => {
+                        document.body.removeChild(notification);
+                    }, 300);
+                }, 3000);
+            }
+
+            saveTasks() {
+                localStorage.setItem('tasks', JSON.stringify(this.tasks));
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+        }
+
+        // Initialize the task tracker
+        let taskTracker;
+        document.addEventListener('DOMContentLoaded', () => {
+            taskTracker = new TaskTracker();
+        });
+
+        // Bubble animation script
+        const canvas = document.getElementById('interactive-bubbles');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let bubbles = [];
+        const mouse = {
+            x: null,
+            y: null,
+            radius: 150
+        }
+
+        window.addEventListener('mousemove', (event) => {
+            mouse.x = event.x;
+            mouse.y = event.y;
+        });
+
+        class Bubble {
+            constructor(x, y, directionX, directionY, size, color) {
+                this.x = x;
+                this.y = y;
+                this.directionX = directionX;
+                this.directionY = directionY;
+                this.size = size;
+                this.color = color;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+
+            update() {
+                if (this.x > canvas.width || this.x < 0) {
+                    this.directionX = -this.directionX;
+                }
+                if (this.y > canvas.height || this.y < 0) {
+                    this.directionY = -this.directionY;
+                }
+
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < mouse.radius + this.size) {
+                    if (mouse.x < this.x && this.x < canvas.width - this.size * 10) {
+                        this.x += 10;
+                    }
+                    if (mouse.x > this.x && this.x > this.size * 10) {
+                        this.x -= 10;
+                    }
+                    if (mouse.y < this.y && this.y < canvas.height - this.size * 10) {
+                        this.y += 10;
+                    }
+                    if (mouse.y > this.y && this.y > this.size * 10) {
+                        this.y -= 10;
+                    }
+                }
+
+                this.x += this.directionX;
+                this.y += this.directionY;
+                this.draw();
+            }
+        }
+
+        function init() {
+            bubbles = [];
+            let numberOfBubbles = (canvas.height * canvas.width) / 9000;
+            for (let i = 0; i < numberOfBubbles; i++) {
+                let size = (Math.random() * 5) + 1;
+                let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
+                let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
+                let directionX = (Math.random() * 5) - 2.5;
+                let directionY = (Math.random() * 5) - 2.5;
+                let color = 'rgba(160, 82, 45, 0.3)';
+
+                bubbles.push(new Bubble(x, y, directionX, directionY, size, color));
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.clearRect(0, 0, innerWidth, innerHeight);
+
+            for (let i = 0; i < bubbles.length; i++) {
+                bubbles[i].update();
+            }
+        }
+
+        init();
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = innerWidth;
+            canvas.height = innerHeight;
+            mouse.radius = 150;
+            init();
+        });
+    </script>
+</body>
+</html>

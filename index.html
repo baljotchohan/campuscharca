@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Charcha - Profile</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <a href="index.html"><img src="logo.png" alt="Campus Charcha Logo"></a>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="features.html">Features</a></li>
+            <li><a href="chatbot.html">Chatbot</a></li>
+            <li><a href="quiz.html">Quiz</a></li>
+            <li><a href="progress.html">Progress</a></li>
+            <li><a href="profile.html" class="active">Profile</a></li>
+        </ul>
+    </nav>
+
+    <div class="container profile-page">
+        <h1>My Profile</h1>
+        <div class="profile-section">
+            <img id="profile-pic" src="default-avatar.png" alt="Profile Picture" width="120" height="120">
+            <input type="file" id="upload-pic" accept="image/*">
+            <button onclick="uploadProfilePic()">Save Picture</button>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('upload-pic');
+        const profilePic = document.getElementById('profile-pic');
+
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    profilePic.src = e.target.result; // Preview before saving
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        async function uploadProfilePic() {
+            const file = fileInput.files[0];
+            if (!file) return alert("Please select an image!");
+
+            const formData = new FormData();
+            formData.append("profilePic", file);
+
+            await fetch("/api/upload", {
+                method: "POST",
+                body: formData
+            });
+
+            alert("Profile picture saved!");
+        }
+    </script>
+</body>
+
+</html>
