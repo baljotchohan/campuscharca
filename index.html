@@ -1,67 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campus Charcha - Profile</title>
+    <title>Campus Charcha - AI Powered Career Guidance</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&family=Montserrat&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
-
 <body>
-    <nav class="navbar">
-        <div class="logo">
-            <a href="index.html"><img src="logo.png" alt="Campus Charcha Logo"></a>
-        </div>
-        <ul class="nav-links">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="features.html">Features</a></li>
-            <li><a href="chatbot.html">Chatbot</a></li>
-            <li><a href="quiz.html">Quiz</a></li>
-            <li><a href="progress.html">Progress</a></li>
-            <li><a href="profile.html" class="active">Profile</a></li>
-        </ul>
-    </nav>
+    <canvas id="interactive-bubbles"></canvas>
+    <img src="logo.png" alt="Campus Charcha Logo" class="logo">
+    <div class="top-nav">
+        <a href="profile.html">Profile</a>
+        <a href="features.html">Features</a>
+        <a href="progress.html">Progress</a>
+    </div>
 
-    <div class="container profile-page">
-        <h1>My Profile</h1>
-        <div class="profile-section">
-            <img id="profile-pic" src="default-avatar.png" alt="Profile Picture" width="120" height="120">
-            <input type="file" id="upload-pic" accept="image/*">
-            <button onclick="uploadProfilePic()">Save Picture</button>
+    <div class="container homepage">
+        <div class="left">
+            <!-- Illustration of books + butterfly can go here -->
+        </div>
+        <div class="center">
+            <h1>AI-POWERED CAREER GUIDANCE</h1>
+            <p class="subtext">Your AI-powered guide to navigating your career path with confidence.</p>
+            <div>
+                <a href="quiz.html" class="btn">Make your career</a>
+                <a href="chatbot.html" class="btn">Chat with AI</a>
+            </div>
+        </div>
+        <div class="right">
+            <img src="logo.png" alt="Campus Charcha Logo" class="logo-side">
+            <p>AI career buddy</p>
+            <p>एआई करियर मित्र</p>
+            <a href="features.html" class="btn">Features</a>
         </div>
     </div>
 
     <script>
-        const fileInput = document.getElementById('upload-pic');
-        const profilePic = document.getElementById('profile-pic');
+        const canvas = document.getElementById('interactive-bubbles');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
-        fileInput.addEventListener('change', () => {
-            const file = fileInput.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    profilePic.src = e.target.result; // Preview before saving
-                };
-                reader.readAsDataURL(file);
-            }
+        let bubbles = [];
+        const mouse = {
+            x: null,
+            y: null,
+            radius: 150
+        }
+
+        window.addEventListener('mousemove', (event) => {
+            mouse.x = event.x;
+            mouse.y = event.y;
         });
 
-        async function uploadProfilePic() {
-            const file = fileInput.files[0];
-            if (!file) return alert("Please select an image!");
+        class Bubble {
+            constructor(x, y, directionX, directionY, size, color) {
+                this.x = x;
+                this.y = y;
+                this.directionX = directionX;
+                this.directionY = directionY;
+                this.size = size;
+                this.color = color;
+            }
 
-            const formData = new FormData();
-            formData.append("profilePic", file);
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
 
-            await fetch("/api/upload", {
-                method: "POST",
-                body: formData
-            });
+            update() {
+                if (this.x > canvas.width || this.x < 0) {
+                    this.directionX = -this.directionX;
+                }
+                if (this.y > canvas.height || this.y < 0) {
+                    this.directionY = -this.directionY;
+                }
 
-            alert("Profile picture saved!");
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < mouse.radius + this.size) {
+                    if (mouse.x < this.x && this.x < canvas.width - this.size * 10) {
+                        this.x += 10;
+                    }
+                    if (mouse.x > this.x && this.x > this.size * 10) {
+                        this.x -= 10;
+                    }
+                    if (mouse.y < this.y && this.y < canvas.height - this.size * 10) {
+                        this.y += 10;
+                    }
+                    if (mouse.y > this.y && this.y > this.size * 10) {
+                        this.y -= 10;
+                    }
+                }
+
+                this.x += this.directionX;
+                this.y += this.directionY;
+                this.draw();
+            }
         }
-    </script>
-</body>
 
+        function init() {
+            bubbles = [];
+            let numberOfBubbles = (canvas.height * canvas.width) / 9000;
+            for (let i = 0; i < numberOfBubbles; i++) {
+                let size = (Math.random() * 5) + 1;
+                let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
+                let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
+                let directionX = (Math.random() * 5) - 2.5;
+                let directionY = (Math.random() * 5) - 2.5;
+                let color = 'rgba(160, 82, 45, 0.3)';
+
+                bubbles.push(new Bubble(x, y, directionX, directionY, size, color));
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.clearRect(0, 0, innerWidth, innerHeight);
+
+            for (let i = 0; i < bubbles.length; i++) {
+                bubbles[i].update();
+            }
+        }
+
+        init();
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = innerWidth;
+            canvas.height = innerHeight;
+            mouse.radius = 150;
+            init();
+        });
+
+    </script>
+
+</body>
 </html>
