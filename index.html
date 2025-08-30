@@ -13,39 +13,39 @@
       background-color: #fcefdc;
       color: #000;
     }
+
+    /* Top nav bar */
     .top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 30px;
+      padding: 10px 40px;
+      background: #fff3e0;
+      border-bottom: 1px solid #ddd;
     }
     .top-bar img {
       height: 50px;
     }
-    .search-bar {
-      flex: 1;
-      margin: 0 20px;
-      position: relative;
+    .nav-links {
+      display: flex;
+      gap: 20px;
     }
-    .search-bar input {
-      width: 100%;
-      padding: 10px 40px 10px 15px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 14px;
+    .nav-links a {
+      text-decoration: none;
+      font-weight: 600;
+      color: #333;
+      transition: 0.2s;
     }
-    .search-bar i {
-      position: absolute;
-      right: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #666;
+    .nav-links a:hover {
+      color: #ff6f00;
     }
     .icons {
       display: flex;
       gap: 15px;
       font-size: 22px;
     }
+
+    /* Page layout */
     .container {
       display: flex;
       justify-content: space-between;
@@ -53,7 +53,7 @@
       padding: 40px 60px;
     }
     .left img {
-      width: 280px;
+      width: 250px;
     }
     .center {
       flex: 1;
@@ -61,7 +61,7 @@
       text-align: center;
     }
     .center h1 {
-      font-size: 42px;
+      font-size: 40px;
       font-weight: 900;
       margin: 0 0 15px;
     }
@@ -80,47 +80,54 @@
       text-decoration: none;
       box-shadow: 2px 3px 6px rgba(0,0,0,0.3);
     }
+
+    /* Features box (smaller) */
     .right {
-      max-width: 320px;
+      max-width: 260px;
       background: linear-gradient(180deg, #f7c68b, #c9e3b1);
-      padding: 20px;
+      padding: 15px;
       border-radius: 6px;
       text-align: center;
+      font-size: 14px;
     }
     .right img {
-      width: 120px;
-      margin-bottom: 10px;
+      width: 90px;
+      margin-bottom: 8px;
     }
     .right p {
       margin: 5px 0;
     }
     .right .btn {
       display: inline-block;
-      margin-top: 15px;
+      margin-top: 12px;
       background: black;
       color: white;
-      padding: 10px 22px;
+      padding: 8px 18px;
       border-radius: 30px;
       text-decoration: none;
+      font-size: 13px;
       box-shadow: 2px 3px 6px rgba(0,0,0,0.3);
     }
   </style>
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body>
+  <!-- Nav Bar -->
   <div class="top-bar">
     <img src="logo.png" alt="Campus Charcha">
-    <div class="search-bar">
-      <input type="text" placeholder="Search...">
-      <i class="fas fa-search"></i>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="features.html">Features</a>
+      <a href="quiz.html">Quiz</a>
+      <a href="chatbot.html">Chat</a>
+      <a href="profile.html">Profile</a>
     </div>
     <div class="icons">
-      <i class="fas fa-home"></i>
-      <i class="fas fa-camera"></i>
       <i class="fas fa-user-circle"></i>
     </div>
   </div>
 
+  <!-- Content -->
   <div class="container">
     <div class="left">
       <img src="book.png" alt="Books Illustration">
@@ -133,8 +140,8 @@
     </div>
     <div class="right">
       <img src="logo.png" alt="Campus Charcha Logo">
-      <p>Campus Charcha is your AI career buddy. Ask questions, explore new paths, and grow with confidence. Discover careers made simple, and follow clear roadmaps to learn and succeed.</p>
-      <p>कैंपस चर्चा आपका एआई करियर साथी है। सवाल पूछें, नए रास्ते खोजें और आत्मविश्वास के साथ आगे बढ़ें। करियर को आसान बनाएं और साफ-सुथरे रोडमैप के साथ सीखें और सफलता पाएं।</p>
+      <p>Campus Charcha is your AI career buddy. Ask questions, explore new paths, and grow with confidence.</p>
+      <p>कैंपस चर्चा आपका एआई करियर साथी है। सवाल पूछें, नए रास्ते खोजें और आत्मविश्वास के साथ आगे बढ़ें।</p>
       <a href="features.html" class="btn">Features</a>
     </div>
   </div>
